@@ -255,12 +255,12 @@ def create_comprehensive_equipment_chart(military_df):
     countries = [country_names[name] for name in military_df['country_name']]
 
     # 装备类型 - 标准化数据
-    equipment_types = ['坦克', '战斗机', '攻击机', '直升机', '武直','战略轰炸']
+    equipment_types = ['坦克', '作战飞机', '预警机', '直升机', '武直','战略轰炸']
 
     equipment_data = {
         '坦克': military_df['tanks'].tolist(),
-        '战斗机': military_df['fighter_aircrafts'].tolist(),
-        '攻击机': military_df['attack_aircrafts'].tolist(),
+        '作战飞机': military_df['fightaircrafts'].tolist(),
+        '预警机': military_df['aew'].tolist(),
         '直升机': military_df['helicopters'].tolist(),
         '武直': military_df['attack_helicopters'].tolist(),
         '战略轰炸':military_df['bombers'].tolist()
