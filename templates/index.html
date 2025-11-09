@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2020s中国周边国家军事力量发展分析可视化</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Pyecharts JS -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar-header {
+            padding: 2rem 1rem;
+            border-bottom: 1px solid #4a6278;
+            text-align: center;
+            background: rgba(0,0,0,0.1);
+        }
+        .sidebar-header h4 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.2rem;
+            line-height: 1.4;
+            color: #ecf0f1;
+        }
+        .nav-link {
+            color: #b8c7d6;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            margin: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-link:hover {
+            color: white;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-left-color: #3498db;
+            transform: translateX(5px);
+        }
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-left-color: #3498db;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+        .nav-section {
+            padding: 1rem 0;
+        }
+        .nav-section-title {
+            color: #95a5a6;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .main-content {
+            padding: 2rem;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            scroll-margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .chart-container.hidden {
+            display: none;
+        }
+        .chart-content {
+            width: 100%;
+            height: 500px;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3498db;
+        }
+        .stats-card h6 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .stats-card h4 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+        .section-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #3498db;
+            display: inline-block;
+        }
+        .chart-row {
+            margin-bottom: 2rem;
+        }
+        .chart-section {
+            scroll-margin-top: 80px;
+        }
+        .mode-switcher {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .search-tips {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        .mode-indicator {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        /* 回到顶部按钮样式 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 侧边导航栏 -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="sidebar-header">
+                    <h4>2020s中国周边国家军事力量发展分析可视化</h4>
+                </div>
+                <nav class="nav flex-column">
+                    <div class="nav-section">
+                        <div class="nav-section-title">导航模式</div>
+                        <a class="nav-link active" href="#" data-mode="browse">
+                            <i class="bi bi-grid-fill"></i>
+                            浏览模式
+                        </a>
+                        <a class="nav-link" href="#" data-mode="search">
+                            <i class="bi bi-search"></i>
+                            搜索模式
+                        </a>
+                    </div>
+
+                    <div class="nav-section browse-nav">
+                        <div class="nav-section-title">核心指标</div>
+                        <a class="nav-link" href="#expenditure-section">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                            军费趋势分析
+                        </a>
+                        <a class="nav-link" href="#power-bubble-section">
+                            <i class="bi bi-graph-up"></i>
+                            军力综合展示
+                        </a>
+                    </div>
+
+                    <div class="nav-section browse-nav">
+                        <div class="nav-section-title">专项分析</div>
+                        <a class="nav-link" href="#pla-treemap-section">
+                            <i class="bi bi-diagram-3-fill"></i>
+                            解放军构成分析
+                        </a>
+                    </div>
+
+                    <div class="nav-section browse-nav">
+                        <div class="nav-section-title">军事力量构成</div>
+                        <a class="nav-link" href="#personnel-section">
+                            <i class="bi bi-people-fill"></i>
+                            人员构成
+                        </a>
+                        <a class="nav-link" href="#equipment-section">
+                            <i class="bi bi-radar"></i>
+                            主要装备数量
+                        </a>
+                        <a class="nav-link" href="#artillery-section">
+                            <i class="bi bi-bullseye"></i>
+                            炮兵装备
+                        </a>
+                        <a class="nav-link" href="#navy-section">
+                            <i class="bi bi-ship-fill"></i>
+                            海军舰艇
+                        </a>
+                        <a class="nav-link" href="#airforce-section">
+                            <i class="bi bi-airplane-fill"></i>
+                            空军战备率
+                        </a>
+                    </div>
+                </nav>
+            </div>
+            <!-- 主内容区域 -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- 模式切换和搜索框 -->
+                <div class="mode-switcher">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0" id="current-mode">浏览模式</h4>
+                            <div class="mode-indicator" id="browse-mode-indicator">
+                                <i class="bi bi-info-circle"></i>
+                                <span>当前处于浏览模式，显示所有图表内容</span>
+                            </div>
+                            <div class="mode-indicator d-none" id="search-mode-indicator">
+                                <i class="bi bi-search"></i>
+                                <span>当前处于搜索模式，根据搜索关键词显示相关图表</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="search-box d-none" id="search-box">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="输入关键词搜索图表..." id="search-input">
+                                    <button class="btn btn-primary" type="button" id="search-button">
+                                        <i class="bi bi-search"></i> 搜索
+                                    </button>
+                                </div>
+                                <div class="search-tips">
+                                    搜索提示：可搜索"军费"、"人员"、"装备"、"海军"、"空军"、"炮兵"、"军力"等关键词
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 图表区域 -->
+                <div id="charts-container">
+                    <!-- 军费支出趋势图表 -->
+                    <div class="row chart-row">
+                        <div class="col-12">
+                            <div id="expenditure-section" class="chart-container chart-section">
+                                <h3 class="section-title">1993-2024年六国军费动态变化图</h3>
+                                <p class="text-muted mb-4">展示中国及周边主要国家在1993-2024年间的军事支出变化趋势，数据基于SIPRI军事支出数据库。</p>
+                                <div id="expenditure-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 军力综合 -->
+                    <div class="row chart-row">
+                        <div class="col-12">
+                            <div id="power-bubble-section" class="chart-container chart-section">
+                                <h3 class="section-title">军力综合展示分析</h3>
+                                <p class="text-muted mb-4">综合展示各国2023年军费预算、军力指数和总兵力的关系，气泡大小代表总兵力规模</p>
+                                <div id="power-bubble-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 解放军矩阵树图 -->
+                    <div class="row chart-row">
+                        <div class="col-12">
+                            <div id="pla-treemap-section" class="chart-container chart-section">
+                                <h3 class="section-title">解放军军事力量构成分析</h3>
+                            <p class="text-muted mb-4">通过矩形树图直观展示2023年解放军人员、装备等资源配置的结构化分布，面积大小反映数量规模</p>
+                                <div id="pla-treemap-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 人员构成 -->
+                    <div class="row chart-row">
+                        <div class="col-12">
+                            <div id="personnel-section" class="chart-container chart-section">
+                                <h3 class="section-title">军事人员构成</h3>
+                                <p class="text-muted mb-4">2023年各国陆军、海军、空军、预备役和准军事人员构成分析</p>
+                                <div id="personnel-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 装备综合对比 -->
+                    <div class="row chart-row">
+                        <div class="col-lg-6">
+                            <div id="equipment-section" class="chart-container chart-section">
+                                <h3 class="section-title">陆军/空军装备数量</h3>
+                                <p class="text-muted mb-4">多维度展示2023年各国主要装备配置情况，雷达图直观反映装备结构差异</p>
+                                <div id="equipment-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div id="artillery-section" class="chart-container chart-section">
+                                <h3 class="section-title">炮兵装备数量</h3>
+                                <p class="text-muted mb-4">2023年各国自行火炮、牵引火炮、火箭炮等炮兵装备配置情况</p>
+                                <div id="artillery-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 海军和空军 -->
+                    <div class="row chart-row">
+                        <div class="col-lg-6">
+                            <div id="navy-section" class="chart-container chart-section">
+                                <h3 class="section-title">海军主力舰艇构成</h3>
+                                <p class="text-muted mb-4">详细展示各国海军2023年主力舰艇配置情况，包括航母、驱逐舰、潜艇等</p>
+                                <div id="navy-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div id="airforce-section" class="chart-container chart-section">
+                                <h3 class="section-title">空军战备率仪表盘</h3>
+                                <p class="text-muted mb-4">通过仪表盘直观展示2023年各国空军飞机战备完好率，颜色区分战备水平</p>
+                                <div id="airforce-chart" class="chart-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 无搜索结果提示 -->
+                <div id="no-results" class="d-none">
+                    <div class="no-results">
+                        <i class="bi bi-search display-1 text-muted"></i>
+                        <h4 class="mt-3">未找到相关图表</h4>
+                        <p class="text-muted">请尝试使用其他关键词搜索，如"军费"、"人员"、"装备"、"海军"、"空军"、"炮兵"、"军力"等</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 存储图表选项
+        const chartOptions = {
+            expenditure: {{ expenditure_options|safe }},
+            personnel: {{ personnel_options|safe }},
+            equipment: {{ equipment_options|safe }},
+            artillery: {{ artillery_options|safe }},
+            navy: {{ navy_options|safe }},
+            airforce: {{ air_force_options|safe }},
+            power_bubble: {{ power_bubble_options|safe }},
+            pla_treemap: {{ pla_treemap_options|safe }}
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentMode = 'browse';
+            const searchBox = document.getElementById('search-box');
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const currentModeElement = document.getElementById('current-mode');
+            const browseIndicator = document.getElementById('browse-mode-indicator');
+            const searchIndicator = document.getElementById('search-mode-indicator');
+            const modeLinks = document.querySelectorAll('[data-mode]');
+            const navLinks = document.querySelectorAll('.browse-nav .nav-link');
+            const sections = document.querySelectorAll('.chart-section');
+            const chartsContainer = document.getElementById('charts-container');
+            const noResults = document.getElementById('no-results');
+            const backToTopBtn = document.getElementById('backToTop');
+            // 初始化所有图表
+            initAllCharts();
+            // 回到顶部功能
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            // 显示/隐藏回到顶部按钮
+            function toggleBackToTop() {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', toggleBackToTop);
+
+            // 点击回到顶部按钮
+            backToTopBtn.addEventListener('click', scrollToTop);
+
+            // 模式切换
+            modeLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const mode = this.getAttribute('data-mode');
+                    switchMode(mode);
+
+                    // 更新导航激活状态
+                    modeLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            function switchMode(mode) {
+                currentMode = mode;
+                currentModeElement.textContent = mode === 'browse' ? '浏览模式' : '搜索模式';
+
+                if (mode === 'browse') {
+                    searchBox.classList.add('d-none');
+                    browseIndicator.classList.remove('d-none');
+                    searchIndicator.classList.add('d-none');
+                    showAllCharts();
+                    searchInput.value = '';
+                } else {
+                    searchBox.classList.remove('d-none');
+                    browseIndicator.classList.add('d-none');
+                    searchIndicator.classList.remove('d-none');
+                    searchInput.focus();
+                }
+            }
+
+            // 搜索功能
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            function performSearch() {
+                const query = searchInput.value.trim();
+                if (query === '') {
+                    showAllCharts();
+                    return;
+                }
+
+                fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.show_all) {
+                        showAllCharts();
+                    } else {
+                        filterCharts(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('搜索错误:', error);
+                    showAllCharts();
+                });
+            }
+
+            function initAllCharts() {
+                // 初始化所有图表
+                const charts = [
+                    { id: 'expenditure-chart', option: chartOptions.expenditure },
+                    { id: 'personnel-chart', option: chartOptions.personnel },
+                    { id: 'equipment-chart', option: chartOptions.equipment },
+                    { id: 'artillery-chart', option: chartOptions.artillery },
+                    { id: 'navy-chart', option: chartOptions.navy },
+                    { id: 'airforce-chart', option: chartOptions.airforce },
+                    { id: 'power-bubble-chart', option: chartOptions.power_bubble },
+                    { id: 'pla-treemap-chart', option: chartOptions.pla_treemap }
+                ];
+
+                charts.forEach(chartConfig => {
+                    const chartElement = document.getElementById(chartConfig.id);
+                    if (chartElement) {
+                        const chart = echarts.init(chartElement);
+                        chart.setOption(chartConfig.option);
+                    }
+                });
+
+                // 监听窗口大小变化，重新调整图表大小
+                window.addEventListener('resize', function() {
+                    charts.forEach(chartConfig => {
+                        const chartElement = document.getElementById(chartConfig.id);
+                        if (chartElement) {
+                            const chart = echarts.getInstanceByDom(chartElement);
+                            if (chart) {
+                                chart.resize();
+                            }
+                        }
+                    });
+                });
+            }
+
+            function showAllCharts() {
+                chartsContainer.classList.remove('d-none');
+                noResults.classList.add('d-none');
+                document.querySelectorAll('.chart-container').forEach(container => {
+                    container.classList.remove('hidden');
+                });
+
+                // 重新渲染所有图表
+                setTimeout(() => {
+                    const chartIds = [
+                        'expenditure-chart', 'personnel-chart', 'equipment-chart',
+                        'artillery-chart', 'navy-chart', 'airforce-chart', 'power-bubble-chart'
+                    ];
+
+                    chartIds.forEach(chartId => {
+                        const chartElement = document.getElementById(chartId);
+                        if (chartElement) {
+                            const chart = echarts.getInstanceByDom(chartElement);
+                            if (chart) {
+                                chart.resize();
+                            }
+                        }
+                    });
+                }, 100);
+            }
+
+            function filterCharts(filterData) {
+                let hasVisibleCharts = false;
+
+                document.querySelectorAll('.chart-container').forEach(container => {
+                    container.classList.add('hidden');
+                });
+
+                // 定义图表映射
+                const chartMapping = {
+                    'show_expenditure': 'expenditure-section',
+                    'show_personnel': 'personnel-section',
+                    'show_equipment': 'equipment-section',
+                    'show_artillery': 'artillery-section',
+                    'show_navy': 'navy-section',
+                    'show_air_force': 'airforce-section',
+                    'show_power': 'power-bubble-section',
+                    'show_pla_treemap': 'pla-treemap-section'
+                };
+
+                // 显示匹配的图表
+                for (const [key, sectionId] of Object.entries(chartMapping)) {
+                    if (filterData[key]) {
+                        const section = document.getElementById(sectionId);
+                        if (section) {
+                            section.classList.remove('hidden');
+                            hasVisibleCharts = true;
+                        }
+                    }
+                }
+
+                if (hasVisibleCharts) {
+                    chartsContainer.classList.remove('d-none');
+                    noResults.classList.add('d-none');
+
+                    // 重新渲染可见的图表
+                    setTimeout(() => {
+                        const chartsToRender = [];
+                        if (filterData.show_expenditure) chartsToRender.push('expenditure-chart');
+                        if (filterData.show_personnel) chartsToRender.push('personnel-chart');
+                        if (filterData.show_equipment) chartsToRender.push('equipment-chart');
+                        if (filterData.show_artillery) chartsToRender.push('artillery-chart');
+                        if (filterData.show_navy) chartsToRender.push('navy-chart');
+                        if (filterData.show_air_force) chartsToRender.push('airforce-chart');
+                        if (filterData.show_power) chartsToRender.push('power-bubble-chart');
+                        if (filterData.show_pla_treemap) chartsToRender.push('pla-treemap-chart');
+
+                        chartsToRender.forEach(chartId => {
+                            const chartElement = document.getElementById(chartId);
+                            if (chartElement) {
+                                const chart = echarts.getInstanceByDom(chartElement);
+                                if (chart) {
+                                    chart.resize();
+                                }
+                            }
+                        });
+                    }, 100);
+                } else {
+                    chartsContainer.classList.add('d-none');
+                    noResults.classList.remove('d-none');
+                }
+            }
+
+            // 平滑滚动函数
+            function smoothScroll(targetId) {
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            // 为每个导航链接添加点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // 获取目标区域ID
+                    const targetId = this.getAttribute('href').substring(1);
+
+                    // 移除所有active类
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+
+                    // 为当前点击的链接添加active类
+                    this.classList.add('active');
+
+                    // 平滑滚动到目标区域
+                    smoothScroll(targetId);
+                });
+            });
+
+            // 滚动时更新激活状态
+            function updateActiveNav() {
+                if (currentMode !== 'browse') return;
+
+                let currentSection = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.clientHeight;
+                    if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', updateActiveNav);
+        });
+    </script>
+</body>
+</html>
